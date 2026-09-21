@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SkyGuard | Weather Anomaly Detection System</title>
+
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <header class="navbar">
+
+        <div class="logo">
+            <div class="logo-icon">🛡️</div>
+            Sky<span>Guard</span>
+        </div>
+
+        <div class="system-status">
+            <span class="status-dot"></span>
+            <span class="status-text">Network Operational</span>
+        </div>
+
+    </header>
+
+
+    <!-- MAIN DASHBOARD -->
+    <main class="dashboard">
+
+        <!-- HERO -->
+        <section class="hero">
+
+            <div class="hero-text">
+
+                <p class="eyebrow">
+                    WEATHER STATION INTELLIGENCE
+                </p>
+
+                <h1>
+                    Detect. Diagnose.<br>
+                    <span>Protect.</span>
+                </h1>
+
+                <p class="hero-description">
+                    AI-powered monitoring system for detecting
+                    weather sensor anomalies and diagnosing
+                    sensor faults.
+                </p>
+
+            </div>
+
+        </section>
+
+
+        <!-- INDIA MAP SECTION -->
+        <section class="map-section">
+            <div class="section-heading">
+                <div>
+                    <p class="section-label">NATIONAL MONITORING NETWORK</p>
+                    <h2>India Weather Stations Map</h2>
+                </div>
+                <div class="map-legend">
+                    <span class="legend-item"><span class="map-dot green"></span> Normal Station</span>
+                    <span class="legend-item"><span class="map-dot red"></span> Sensor Anomaly</span>
+                </div>
+            </div>
+            <div class="map-container-wrapper">
+                <div id="indiaMap"></div>
+            </div>
+        </section>
+
+
+        <!-- NATIONAL COMMAND CENTER REPLAY SECTION -->
+        <section class="replay-section">
+            <div class="section-heading">
+                <div>
+                    <p class="section-label">NATIONAL COMMAND CENTER</p>
+                    <h2>National Sensor Network Live Telemetry Stream (20 Active Stations)</h2>
+                </div>
+                <div class="replay-controls">
+                    <button id="replayStartBtn" class="replay-btn primary">▶ Start Live Telemetry Feed</button>
+                    <button id="replayPauseBtn" class="replay-btn secondary" disabled>⏸ Pause</button>
+                    <button id="replayResetBtn" class="replay-btn secondary">↻ Reset</button>
+
+                    <div class="speed-control">
+                        <label for="replaySpeed">Speed:</label>
+                        <select id="replaySpeed">
+                            <option value="1">1x</option>
+                            <option value="5" selected>5x</option>
+                            <option value="15">15x</option>
+                            <option value="50">50x</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 15-Day Period PDF Reports Panel -->
+            <div class="reports-section-panel">
+                <div class="reports-header">
+                    <span class="report-badge">15-DAY PDF REPORTS</span>
+                    <h4>Automated 15-Day Period Analysis Reports</h4>
+                </div>
+                <div class="reports-grid" id="reportsGrid">
+                    <a href="http://127.0.0.1:8000/report/1" target="_blank" id="reportBtn1" class="report-dl-btn">📄 Report 1 (Days 1–15)</a>
+                    <a href="http://127.0.0.1:8000/report/2" target="_blank" id="reportBtn2" class="report-dl-btn">📄 Report 2 (Days 16–30)</a>
+                    <a href="http://127.0.0.1:8000/report/3" target="_blank" id="reportBtn3" class="report-dl-btn">📄 Report 3 (Days 31–45)</a>
+                    <a href="http://127.0.0.1:8000/report/4" target="_blank" id="reportBtn4" class="report-dl-btn">📄 Report 4 (Days 46–60)</a>
+                    <a href="http://127.0.0.1:8000/report/5" target="_blank" id="reportBtn5" class="report-dl-btn">📄 Report 5 (Days 61–75)</a>
+                    <a href="http://127.0.0.1:8000/report/6" target="_blank" id="reportBtn6" class="report-dl-btn">📄 Report 6 (Days 76–90)</a>
+                </div>
+            </div>
+
+            <div class="replay-progress-wrapper">
+                <div class="replay-progress-bar">
+                    <div id="replayProgress" class="progress-fill"></div>
+                </div>
+                <div class="replay-status-text" id="replayStatusText">
+                    National Network Online • 20 Active Stations Connected • Press Start Live Telemetry Feed
+                </div>
+            </div>
+        </section>
+
+
+        <!-- SENSOR CARDS -->
+        <section class="sensor-section">
+
+            <div class="section-heading">
+                <div>
+                    <p class="section-label">LIVE TELEMETRY</p>
+                    <h2>Weather Sensors</h2>
+                </div>
+
+                <div class="station-details" aria-label="Station information">
+                    <span class="station-label" id="stationLabel">
+                        Station --
+                    </span>
+
+                    <span id="locationValue">
+                        Location: --
+                    </span>
+
+                    <span id="elevationValue">
+                        Elevation: --
+                    </span>
+
+                    <span id="latestTimeValue">
+                        Latest reading: --
+                    </span>
+                </div>
+            </div>
+
+
+            <div class="sensor-grid">
+
+                <!-- TEMPERATURE -->
+                <div class="sensor-card" data-sensor="temp">
+
+                    <div class="sensor-header">
+                        <span><span class="sensor-type-icon">🌡️</span> Ambient Temperature</span>
+                        <span class="sensor-unit-badge">°C</span>
+                    </div>
+
+                    <div class="sensor-value">
+                        <span id="tempValue">--</span>
+                        <small>°C</small>
+                    </div>
+
+                    <div class="sensor-name">
+                        TRANSDUCER CHANNEL A
+                    </div>
+
+                </div>
+
+
+                <!-- HUMIDITY -->
+                <div class="sensor-card" data-sensor="rhum">
+
+                    <div class="sensor-header">
+                        <span><span class="sensor-type-icon">💧</span> Relative Humidity</span>
+                        <span class="sensor-unit-badge">% RH</span>
+                    </div>
+
+                    <div class="sensor-value">
+                        <span id="rhumValue">--</span>
+                        <small>%</small>
+                    </div>
+
+                    <div class="sensor-name">
+                        HYGROMETER CHANNEL B
+                    </div>
+
+                </div>
+
+
+                <!-- PRESSURE -->
+                <div class="sensor-card" data-sensor="pres">
+
+                    <div class="sensor-header">
+                        <span><span class="sensor-type-icon">⏱️</span> Barometric Pressure</span>
+                        <span class="sensor-unit-badge">hPa</span>
+                    </div>
+
+                    <div class="sensor-value">
+                        <span id="presValue">--</span>
+                        <small>hPa</small>
+                    </div>
+
+                    <div class="sensor-name">
+                        BAROMETER CHANNEL C
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ANALYSIS -->
+        <section class="analysis-section">
+
+            <div class="section-heading">
+
+                <div>
+                    <p class="section-label">MACHINE LEARNING</p>
+                    <h2>SkyGuard Analysis</h2>
+                </div>
+
+            </div>
+
+
+            <div id="predictionCard" class="prediction-card normal">
+
+                <div class="prediction-main">
+
+                    <div class="prediction-icon" id="predictionIcon">
+                        ✓
+                    </div>
+
+                    <div>
+
+                        <p class="prediction-label">
+                            CURRENT STATUS
+                        </p>
+
+                        <h3 id="predictionStatus">
+                            Ready
+                        </h3>
+
+                    </div>
+
+                </div>
+
+
+                <div class="prediction-probability">
+
+                    <span>
+                        Anomaly Probability
+                    </span>
+
+                    <strong id="probability">
+                        --
+                    </strong>
+
+                </div>
+
+
+                <div class="diagnosis-grid">
+
+                    <div class="diagnosis-item">
+
+                        <span>Fault Sensor</span>
+
+                        <strong id="faultSensor">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="diagnosis-item">
+
+                        <span>Fault Type</span>
+
+                        <strong id="faultType">
+                            --
+                        </strong>
+
+                    </div>
+
+
+                    <div class="diagnosis-item">
+
+                        <span>Diagnosis Confidence</span>
+
+                        <strong id="diagnosisConfidence">
+                            --
+                        </strong>
+
+                    </div>
+
+                </div>
+
+                <div class="report-trigger-wrapper">
+                    <button id="downloadReportBtn" class="report-btn hidden">
+                        📄 Generate Anomaly Incident Report
+                    </button>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- CONTROL -->
+        <section class="control-section">
+
+            <button id="predictButton">
+                Analyze Weather Data
+            </button>
+
+            <div id="loading" class="loading hidden">
+                Analyzing sensor data...
+            </div>
+
+            <div id="errorMessage" class="error hidden"></div>
+
+        </section>
+
+        <!-- ================= SENSOR TRENDS ================= -->
+        <section class="sensor-trends">
+
+            <div class="section-title">
+                <span>SENSOR TRENDS</span>
+                <small>Real-time weather station data</small>
+            </div>
+
+            <div class="charts-grid">
+
+                <!-- Temperature -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <h3>Temperature</h3>
+                            <span>°C</span>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="temperatureChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Humidity -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <h3>Humidity</h3>
+                            <span>% RH</span>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="humidityChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Pressure -->
+                <div class="chart-card">
+                    <div class="chart-header">
+                        <div>
+                            <h3>Pressure</h3>
+                            <span>hPa</span>
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <canvas id="pressureChart"></canvas>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+        <!-- ================= END SENSOR TRENDS ================= -->
+
+    </main>
+
+
+    <!-- INCIDENT REPORT MODAL -->
+    <div id="reportModal" class="modal-overlay hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <span class="report-badge">INCIDENT REPORT</span>
+                    <h3 id="reportTitle">SkyGuard Sensor Anomaly Diagnostic Report</h3>
+                </div>
+                <button id="closeReportBtn" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body" id="reportModalBody">
+                <!-- Dynamic Report Content -->
+            </div>
+            <div class="modal-footer">
+                <button id="printReportBtn" class="report-action-btn primary">🖨 Print / Export PDF Report</button>
+                <button id="dismissReportBtn" class="report-action-btn secondary">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+
+        <span>SKYGUARD</span>
+
+        <span>
+            Weather Station Anomaly Detection System
+        </span>
+
+    </footer>
+
+    <!-- LARGE ANOMALY LIVE INSPECTION HUD MODAL -->
+    <div id="largeAnomalyModal" class="large-anomaly-modal hidden">
+        <div class="anomaly-modal-card">
+            <div class="anomaly-modal-header">
+                <div>
+                    <div class="anomaly-modal-badge">🚨 ANOMALY DETECTED</div>
+                    <h3 id="largeAnomStationName">Station Name (#ID)</h3>
+                </div>
+                <button id="largeAnomCloseBtn" class="close-btn">&times;</button>
+            </div>
+            <div class="anomaly-modal-body">
+                <div class="anomaly-meta-grid">
+                    <div class="anomaly-meta-box highlight-danger">
+                        <span>FAULT SENSOR</span>
+                        <strong id="largeAnomFaultSensor">TEMP_SENSOR</strong>
+                    </div>
+                    <div class="anomaly-meta-box highlight-danger">
+                        <span>FAULT TYPE</span>
+                        <strong id="largeAnomFaultType">SPIKE / ANOMALY</strong>
+                    </div>
+                    <div class="anomaly-meta-box">
+                        <span>ANOMALY RISK</span>
+                        <strong id="largeAnomRisk" style="color:#f43f5e;">98.5%</strong>
+                    </div>
+                    <div class="anomaly-meta-box">
+                        <span>DIAGNOSIS CONFIDENCE</span>
+                        <strong id="largeAnomConfidence" style="color:#fbbf24;">95.0%</strong>
+                    </div>
+                </div>
+
+                <div class="anomaly-telemetry-strip">
+                    <div class="telemetry-strip-item">
+                        <span>🌡️ Temp</span>
+                        <strong id="largeAnomTemp">-- °C</strong>
+                    </div>
+                    <div class="telemetry-strip-item">
+                        <span>💧 Humidity</span>
+                        <strong id="largeAnomRhum">-- %</strong>
+                    </div>
+                    <div class="telemetry-strip-item">
+                        <span>⏱️ Pressure</span>
+                        <strong id="largeAnomPres">-- hPa</strong>
+                    </div>
+                    <div class="telemetry-strip-item">
+                        <span>🕒 Timestamp</span>
+                        <strong id="largeAnomTime">--</strong>
+                    </div>
+                </div>
+            </div>
+            <div class="anomaly-modal-footer">
+                <button id="largeAnomReportBtn" class="anomaly-action-btn primary">📄 Download 15-Day PDF Report</button>
+                <button id="largeAnomResumeBtn" class="anomaly-action-btn secondary">▶ Continue Telemetry Stream</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>

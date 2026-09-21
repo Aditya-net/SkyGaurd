@@ -1,0 +1,23 @@
+# Virtual Environment
+.venv/
+venv/
+env/
+
+# Python Cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Temporary & Scratch Folders
+scratch/
+.tmp/
+
+# Large Training Dataset (>100MB limit for GitHub)
+data/v3_training_data.csv
+
+# IDE & OS Settings
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
